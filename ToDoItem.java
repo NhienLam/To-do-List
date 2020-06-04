@@ -40,7 +40,7 @@ public class ToDoItem implements Comparable
 
 	/**
 	 * Checks if 2 to-do items have the same priority and description
-	 * @return true if 2 items have the same priority and description, false otherwise
+	 * @return true if and only if 2 items have both the same priority and description, false otherwise
 	 */
 	public boolean equals(Object otherObject)
 	{
@@ -59,6 +59,7 @@ public class ToDoItem implements Comparable
 
 	/**
 	 * Compares the to-do item by priority and description
+	 * If priorities are equal, order by description
 	 * @return the difference of the 2 items
 	 */
 	public int compareTo(Object otherObject)
