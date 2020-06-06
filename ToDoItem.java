@@ -82,7 +82,7 @@ public class ToDoItem implements Comparable
 	 */
 	public String toString()
 	{
-		return  getClass().getName() + "[description=" + description  + ",priority=" + priority + "]";
+		return "#" + priority + ":     " + description;
 	}
 
 }
