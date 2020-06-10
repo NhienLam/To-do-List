@@ -115,6 +115,47 @@ public class ToDoList
 		}
 	}
 	
+	/**
+	 * Writes the List to a File
+	 */
+	public void writeDataToFile()
+	{
+		try
+		{
+			// Build a chain of writers
+			File f = new File("savedTodoList");
+			FileWriter fw = new FileWriter(f, true);
+			BufferedWriter bw = new BufferedWriter(fw);
+			
+			bw.write("TO-DO LIST: ");
+			bw.newLine();
+			
+			if(toDo.isEmpty())
+			{
+				bw.write("The List is empty");
+				bw.newLine();
+			}
+			else
+			{
+				Iterator itr = toDo.iterator(); 
+		        while (itr.hasNext()) 
+		        {
+		        	bw.write(itr.next().toString());
+					bw.newLine();
+		        }
+			}		
+			
+			bw.newLine();
+			
+			// Close bw and fw
+			bw.close();
+			fw.close();
+		}
+		catch (IOException ioe)
+		{
+			ioe.getMessage();
+		}
+	}
 	
 	/**
 	 * Changes the priority of the existed Task
@@ -248,6 +289,15 @@ public class ToDoList
 			
 			ToDoItem target = new ToDoItem(description, priority);
 			toDo.remove(target);
+			
+			runToDoList();
+		}
+		
+		// Save the List ie. Write the List in another file
+		else if(input.equals("s"))
+		{
+			writeDataToFile();
+			System.out.println("Saved!");
 			
 			runToDoList();
 		}
