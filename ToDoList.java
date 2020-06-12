@@ -1,4 +1,22 @@
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.Iterator;
 import java.util.PriorityQueue;
+import java.util.Scanner;
+
+/*******************************************************
+ Next we will write the method that will modify the saved file.
+ This will help getting the data from the list that we have saved to continue updating 
+ (adding, removing, or changing priority) the old list.
+ 
+ and also fix the input of user. Problem: if user input wrong "alibaba" it means "add" when we put substring(0) in the runToDoList()
+ ******************************************************/
+
 
 /**
  * Build a to-do list with priority to-do items
@@ -118,35 +136,25 @@ public class ToDoList
 	/**
 	 * Writes the List to a File
 	 */
-	public void writeDataToFile()
+	public void writeDataToFile(String filename)
 	{
 		try
 		{
 			// Build a chain of writers
-			File f = new File("savedTodoList");
-			FileWriter fw = new FileWriter(f, true);
+			File f = new File(filename);
+			FileWriter fw = new FileWriter(f);
 			BufferedWriter bw = new BufferedWriter(fw);
 			
-			bw.write("TO-DO LIST: ");
+			bw.write("***** TO-DO LIST ***** ");
 			bw.newLine();
-			
-			if(toDo.isEmpty())
+
+			Iterator itr = toDo.iterator(); 
+			while (itr.hasNext()) 
 			{
-				bw.write("The List is empty");
+				bw.write(itr.next().toString());
 				bw.newLine();
 			}
-			else
-			{
-				Iterator itr = toDo.iterator(); 
-		        while (itr.hasNext()) 
-		        {
-		        	bw.write(itr.next().toString());
-					bw.newLine();
-		        }
-			}		
-			
-			bw.newLine();
-			
+					
 			// Close bw and fw
 			bw.close();
 			fw.close();
@@ -178,6 +186,42 @@ public class ToDoList
 		}
 	}
 	
+	public ToDoList readFile(String filename) throws FileNotFoundException 
+	{
+		ToDoList tdList = new ToDoList();
+
+		try
+		{
+			// Build chain of readers.
+			File f = new File(filename);
+			FileReader fr = new FileReader(f);
+			BufferedReader br = new BufferedReader(fr);
+			
+			// Skip the first line, which is not a task
+			br.readLine();
+			
+			String line;
+			
+			// Read each task until the end of the file
+			while((line = br.readLine()) != null)
+			{
+				String[] arr = line.split(":");
+				ToDoItem item = new ToDoItem(arr[1].trim(), Integer.parseInt(arr[0].trim()));
+				tdList.add(item);	
+			}	
+			
+			//Close br, fr
+			br.close();
+			fr.close();	
+		}
+		catch(IOException ioe)
+		{
+			System.out.println(ioe.getMessage());
+		}
+		
+		return tdList;		
+	}
+	
 	/**
 	 * Starts the ToDoList tasks
 	 */
@@ -188,6 +232,7 @@ public class ToDoList
 		System.out.println("What do you want to perform?"  
 				+ "\n" + "Press 'd' --- Display List"
 				+ "\n" + "Press 's' --- Save List"
+				+ "\n" + "Press 'g' --- Get Saved List"
 				+ "\n" + "Press 'a' --- Add Task"
 				+ "\n" + "Press 'r' --- Remove Task"
 				+ "\n" + "Press 'c' --- Change Priority"
@@ -296,8 +341,26 @@ public class ToDoList
 		// Save the List ie. Write the List in another file
 		else if(input.equals("s"))
 		{
-			writeDataToFile();
+			writeDataToFile("savedTodoList");
 			System.out.println("Saved!");
+			
+			runToDoList();
+		}
+		
+		// Get the saved List
+		else if(input.equals("g"))
+		{
+			try
+			{
+				ToDoList savedList = readFile("savedTodoList");
+				System.out.println("*** This is the Saved List ***");
+				
+				savedList.display();
+			}
+			catch(FileNotFoundException fnf)
+			{
+				System.out.println(fnf.getMessage());
+			}
 			
 			runToDoList();
 		}
