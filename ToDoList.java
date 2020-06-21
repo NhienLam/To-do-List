@@ -1,7 +1,16 @@
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.util.Iterator;
 import java.util.PriorityQueue;
+import java.util.Scanner;
 
 /**
- * Build a to-do list with priority to-do items
+ * Build a To-Do List with priority to-do items
  * @author Nhien (Ricky) Lam 
  *
  */
@@ -24,6 +33,7 @@ public class ToDoList
 	public void add(ToDoItem item) 
 	{
 		toDo.add(item);
+		System.out.println("Added!");
 	}
 	
 	/**
@@ -84,18 +94,20 @@ public class ToDoList
 	 */
 	public void display()
 	{
+		System.out.println("*********************");
 		if(toDo.isEmpty())
 		{
 			System.out.println("The List is empty");
 		}
 		else
 		{
-			Iterator itr = toDo.iterator(); 
-	        while (itr.hasNext()) 
+			PriorityQueue<ToDoItem> sub = new PriorityQueue<>(toDo);
+			while(!sub.isEmpty())
 	        {
-	            System.out.println(itr.next());
+	            System.out.println(sub.remove());
 	        }
-		}		
+		}
+		System.out.println("*********************");
     }
 	
 	/**
@@ -108,9 +120,11 @@ public class ToDoList
 		if(toDo.contains(target))
 		{
 			toDo.remove(target);
+			System.out.println("Removed!");
 		}
 		else
 		{
+			System.out.println("ERROR: There is no such item in the List");
 			runToDoList();
 		}
 	}
@@ -118,35 +132,25 @@ public class ToDoList
 	/**
 	 * Writes the List to a File
 	 */
-	public void writeDataToFile()
+	public void writeDataToFile(String filename)
 	{
 		try
 		{
 			// Build a chain of writers
-			File f = new File("savedTodoList");
-			FileWriter fw = new FileWriter(f, true);
+			File f = new File(filename);
+			FileWriter fw = new FileWriter(f);
 			BufferedWriter bw = new BufferedWriter(fw);
 			
-			bw.write("TO-DO LIST: ");
+			bw.write("***** TO-DO LIST ***** ");
 			bw.newLine();
-			
-			if(toDo.isEmpty())
+
+			Iterator itr = toDo.iterator(); 
+			while (itr.hasNext()) 
 			{
-				bw.write("The List is empty");
+				bw.write(itr.next().toString());
 				bw.newLine();
 			}
-			else
-			{
-				Iterator itr = toDo.iterator(); 
-		        while (itr.hasNext()) 
-		        {
-		        	bw.write(itr.next().toString());
-					bw.newLine();
-		        }
-			}		
-			
-			bw.newLine();
-			
+					
 			// Close bw and fw
 			bw.close();
 			fw.close();
@@ -173,47 +177,92 @@ public class ToDoList
 		}
 		else
 		{
-			System.out.println("There is no such Task in the List");
+			System.out.println("ERROR! There is no such Task in the List");
 			runToDoList();
 		}
 	}
+
+	/**
+	 * Reads data from another file (the saved List)
+	 * @param filename the file to read
+	 * @throws FileNotFoundException
+	 */
+	public void readFile(String filename) throws FileNotFoundException 
+	{
+		try
+		{
+			// Build chain of readers.
+			File f = new File(filename);
+			FileReader fr = new FileReader(f);
+			BufferedReader br = new BufferedReader(fr);
+			
+			// Skip the first line, which is not a task
+			br.readLine();
+			
+			String line;
+			
+			// Read each task until the end of the file
+			while((line = br.readLine()) != null)
+			{
+				String[] arr = line.split(":");
+				ToDoItem item = new ToDoItem(arr[1].trim(), Integer.parseInt(arr[0].trim()));
+				this.add(item);	
+			}	
+			
+			//Close br, fr
+			br.close();
+			fr.close();	
+		}
+		catch(IOException ioe)
+		{
+			System.out.println(ioe.getMessage());
+		}
+		
+		System.out.println("*** This is the Saved List ***");
+		this.display();		
+	}
+	
 	
 	/**
 	 * Starts the ToDoList tasks
 	 */
 	public void runToDoList()
 	{
+		System.out.println("*********************");
+
+		// valid input options
+		String s = "dsgarcq";
+		
+		// get input from user
 		Scanner in = new Scanner(System.in);
 		
-		System.out.println("What do you want to perform?"  
-				+ "\n" + "Press 'd' --- Display List"
-				+ "\n" + "Press 's' --- Save List"
-				+ "\n" + "Press 'a' --- Add Task"
-				+ "\n" + "Press 'r' --- Remove Task"
-				+ "\n" + "Press 'c' --- Change Priority"
-				+ "\n" + "Press 'e' --- End"
+		System.out.print("What do you want to do?"  
+				+ "\n" + "Enter 'D' --- Display List"
+				+ "\n" + "Enter 'S' --- Save List"
+				+ "\n" + "Enter 'G' --- Get Saved List"
+				+ "\n" + "Enter 'A' --- Add Task"
+				+ "\n" + "Enter 'R' --- Remove Task"
+				+ "\n" + "Enter 'C' --- Change Priority"
+				+ "\n" + "Enter 'Q' --- Quit"
+				+ "\n" + "Enter you option: "
 				);
 		
 		String input = in.nextLine();
 		
-		// Ask again if the user didn't enter anything
-		while(input.length() == 0)
+		// Check if the input is valid
+		while(!s.contains(input) || input.length() != 1)
 		{
-			System.out.println("Invalid input! Please try again"
-					+ "\n" + "Press 'd' --- Display List"
-					+ "\n" + "Press 's' --- Save List"
-					+ "\n" + "Press 'a' --- Add Task"
-					+ "\n" + "Press 'r' --- Remove Task"
-					+ "\n" + "Press 'c' --- Change Priority"
-					+ "\n" + "Press 'e' --- End"
+			System.out.println("*********************");
+			System.out.print("Invalid input! Please try again"
+					+ "\n" + "Enter 'D' --- Display List"
+					+ "\n" + "Enter 'S' --- Save List"
+					+ "\n" + "Enter 'A' --- Add Task"
+					+ "\n" + "Enter 'R' --- Remove Task"
+					+ "\n" + "Enter 'C' --- Change Priority"
+					+ "\n" + "Enter 'Q' --- Quit"
+					+ "\n" + "Enter you option: "
 					);
 			input = in.nextLine();
-		}
-		
-		// If the input is more than 1 character, only take the 1st character of the input
-		if(input.length() > 1) 
-		{
-			input = input.substring(0,1);
 		}
 		
 		// Add task to the List
@@ -225,12 +274,12 @@ public class ToDoList
 			String pri = in.nextLine();
 			while(!isInteger(pri))
 			{
-				System.out.println("Invalid input! Please enter an Integer for priority: ");
+				System.out.println("ERROR: Invalid input! Please enter an Integer for priority: ");
 				pri = in.nextLine();
 			}
+
 			int priority = Integer.valueOf(pri);
-			ToDoItem task = new ToDoItem(description, priority);
-			add(task);
+			this.add( new ToDoItem(description, priority));
 			
 			runToDoList();
 		}
@@ -268,6 +317,7 @@ public class ToDoList
 			int afterPriority = Integer.valueOf(afterPri);
 			
 			changePriority(description, beforePriority, afterPriority);
+			System.out.println("Changed!");
 			
 			runToDoList();
 		}
@@ -296,30 +346,31 @@ public class ToDoList
 		// Save the List ie. Write the List in another file
 		else if(input.equals("s"))
 		{
-			writeDataToFile();
+			writeDataToFile("savedTodoList");
 			System.out.println("Saved!");
 			
 			runToDoList();
 		}
 		
-		// Stop running
-		else if(input.equals("e"))
+		// Get the saved List
+		else if(input.equals("g"))
 		{
-			System.out.println("Thank you!!");
+			try
+			{				
+				readFile("savedTodoList");
+			}
+			catch(FileNotFoundException fnf)
+			{
+				System.out.println(fnf.getMessage());
+			}
+			
+			runToDoList();
 		}
 		
-		// The input is valid, ask again
-		else
+		// Stop running
+		else if(input.equals("q"))
 		{
-			// *********************** HAVEN'T FINISHED
-			System.out.println("Invalid input! Please try again"
-					+ "\n" + "Press 'd' --- Display List"
-					+ "\n" + "Press 's' --- Save List"
-					+ "\n" + "Press 'a' --- Add Task"
-					+ "\n" + "Press 'r' --- Remove Task"
-					+ "\n" + "Press 'c' --- Change Task"
-					);
-			input = in.nextLine();
+			System.out.println("Thank you!! See you again!");
 		}
 	}
 }
