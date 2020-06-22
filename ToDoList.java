@@ -103,12 +103,12 @@ public class ToDoList
 		{
 			PriorityQueue<ToDoItem> sub = new PriorityQueue<>(toDo);
 			while(!sub.isEmpty())
-	        {
-	            System.out.println(sub.remove());
-	        }
+	     		{
+				System.out.println(sub.remove());
+	        	}
 		}
-		System.out.println("*********************");
-    }
+		System.out.println("*********************")
+	}
 	
 	/**
 	 * 
